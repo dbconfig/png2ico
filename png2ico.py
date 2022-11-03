@@ -19,7 +19,11 @@ def png2ico(pngs_paths: Sequence[str], ico_path: str, *, auto_resize: bool = Fal
 
         for png_path in pngs_paths:
             img = Image.open(png_path)
-            data += bytes((img.width, img.height, 0, 0, 1, 0, 32, 0,))
+            try:
+                data += bytes((img.width, img.height, 0, 0, 1, 0, 32, 0,))
+            except ValueError:
+                raise ValueError('Image size can\'t be larger than 255x255 pixels. '
+                                 'Resize your image or use -r flag to continue.')
             bytesize = Path(png_path).stat().st_size
             data += bytesize.to_bytes(4, byteorder="little")
             data += offset.to_bytes(4, byteorder="little")
